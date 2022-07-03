@@ -20,49 +20,57 @@
 int getsline(char line[], int maxline);
 void copy(char to[], char from[]);
 
+/* print longest line: read the input and print the longest line */
 int main()
 {
-	int state;           /* state: IN or OUT of limit */
-	int len, max;        /* current length and maximum length seen so far */
-	char c;              /* to count extra characters */
-	char line[MAX];      /* current line */
-	char longest[MAX];   /* stores the longest line */
+	int state;         /* state: IN or OUT of limit */
+	int len, max;      /* current length and maximum length seen so far */
+	char c;            /* to count extra characters */
+	char line[MAX];    /* current line */
+	char longest[MAX]; /* stores the longest line */
 
 	len = max = 0;
 	state = IN;
 
 	while ((len = getsline(line, MAX)) > 0) {
-		/* is inside the maximum limit? */
+		/* is it inside the maximum limit? */
 		if (len >= MAX-1 && line[len] != '\n' && line[len] != EOF)
 			state = OUT;
 		else
 			state = IN;
 
-		/* continue counting characters if outside the limit */
+		/* continue counting characters if it's outside the limit */
 		if (state == OUT)
 			while	((c = getchar()) != '\n' && c != EOF)
 				++len;
 
-		/* copy line if length is greater than the greater seen so far */
+		/* copy line if the length is greater than the greater seen so far */
 		if (len > max) {
 			max = len;
 			copy(longest, line);
 		}
 	}
 
-	/* print longest line and indicates if it's longer than the limit or not */
+	/*
+	 * replace unwanted chars with a null char to print the line correctly, and
+	 * also reduce "max" count by one to show it correctly
+	 */
+	if (longest[max-1] == '\n') {
+		longest[max-1] = '\0';
+		--max;
+	}
+
+	/* print longest line and indicates wheter it's longer than the limit or not */
 	if (max > 0) {
-		printf("\n\nLongest line length: %d\nLongest line content: %s", max, longest);
+		printf("\n\nLongest line length: %d\nLongest line content: %s\n", max, longest);
 		if (state == OUT)
 			printf("...\n");
-		else
-			printf(".\n");
 	}
 
 	return 0;
 }
 
-/* getline: read a line into "s", return length */
+/* getsline: read a line into "s", return length */
 int getsline(char s[], int lim)
 {
 	int c, i;
